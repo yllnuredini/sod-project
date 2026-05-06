@@ -1,4 +1,5 @@
 import os
+import time
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
@@ -46,20 +47,48 @@ def evaluate(model, test_loader, device):
                 f1_scores.append(f1)
                 maes.append(compute_mae(pred, target))
 
-    print("\n📊 Evaluation Results:")
-    print(f"IoU:       {np.mean(iou_scores):.4f}")
-    print(f"Precision: {np.mean(precisions):.4f}")
-    print(f"Recall:    {np.mean(recalls):.4f}")
-    print(f"F1-Score:  {np.mean(f1_scores):.4f}")
-    print(f"MAE:       {np.mean(maes):.4f}")
-
-    return {
+    results = {
         "iou": np.mean(iou_scores),
         "precision": np.mean(precisions),
         "recall": np.mean(recalls),
         "f1": np.mean(f1_scores),
         "mae": np.mean(maes)
     }
+
+    print("\n📊 Evaluation Results:")
+    print(f"IoU:       {results['iou']:.4f}")
+    print(f"Precision: {results['precision']:.4f}")
+    print(f"Recall:    {results['recall']:.4f}")
+    print(f"F1-Score:  {results['f1']:.4f}")
+    print(f"MAE:       {results['mae']:.4f}")
+
+    return results
+
+# ─── Inference Time ──────────────────────────────────────────
+def measure_inference_time(model, device, num_runs=50):
+    model.eval()
+    dummy = torch.randn(1, 3, 224, 224).to(device)
+
+    # Warmup
+    with torch.no_grad():
+        for _ in range(10):
+            _ = model(dummy)
+
+    # Measure
+    times = []
+    with torch.no_grad():
+        for _ in range(num_runs):
+            start = time.time()
+            _ = model(dummy)
+            end = time.time()
+            times.append((end - start) * 1000)
+
+    avg_time = np.mean(times)
+    print(f"\n⏱️ Inference Time:")
+    print(f"Average: {avg_time:.2f} ms per image")
+    print(f"Min:     {np.min(times):.2f} ms")
+    print(f"Max:     {np.max(times):.2f} ms")
+    return avg_time
 
 # ─── Visualize ───────────────────────────────────────────────
 def visualize(model, test_loader, device, num_samples=4):
@@ -76,17 +105,10 @@ def visualize(model, test_loader, device, num_samples=4):
     titles = ["Input Image", "Ground Truth", "Predicted Mask", "Overlay"]
 
     for i in range(num_samples):
-        # Input image
         img = images[i].cpu().permute(1, 2, 0).numpy()
         img = (img - img.min()) / (img.max() - img.min())
-
-        # Ground truth
         gt = masks[i].cpu().squeeze().numpy()
-
-        # Predicted mask
         pred = outputs[i].cpu().squeeze().numpy()
-
-        # Overlay
         overlay = img.copy()
         overlay[:, :, 0] = np.clip(overlay[:, :, 0] + pred * 0.5, 0, 1)
 
@@ -100,6 +122,20 @@ def visualize(model, test_loader, device, num_samples=4):
     print("✅ Visualization saved to results/visualization.png")
     plt.show()
 
+# ─── Comparison Table ────────────────────────────────────────
+def print_comparison_table(baseline, improved):
+    print("\n📊 Baseline vs Improved:")
+    print(f"{'Metrika':<12} {'Baseline':>10} {'Improved':>10} {'Ndryshimi':>12}")
+    print("-" * 46)
+    for key in baseline:
+        b = baseline[key]
+        i = improved[key]
+        diff = ((i - b) / b) * 100
+        arrow = "↑" if i > b else "↓"
+        if key == "mae":
+            arrow = "↓" if i < b else "↑"
+        print(f"{key:<12} {b:>10.4f} {i:>10.4f} {arrow} {abs(diff):>8.1f}%")
+
 # ─── Main ────────────────────────────────────────────────────
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -111,4 +147,5 @@ if __name__ == "__main__":
     print(f"✅ Model loaded from epoch {checkpoint['epoch']}")
 
     evaluate(model, test_loader, device)
+    measure_inference_time(model, device)
     visualize(model, test_loader, device)
