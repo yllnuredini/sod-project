@@ -1,9 +1,11 @@
 # Salient Object Detection (SOD) using CNN
 
 This project implements an End-to-End Salient Object Detection system using a Convolutional Neural Network built from scratch in PyTorch.
+
 The model takes an input image and generates a saliency mask that highlights the most visually important object or region in the image.
 
-Project Contents
+## Project Contents
+
 The repository includes:
 
 - Source code for data loading, model training, and evaluation
@@ -13,8 +15,9 @@ The repository includes:
 - Gradio demo app for testing custom images
 - Project notebook
 
-Project Structure
+## Project Structure
 
+```text
 sod-project/
 │
 ├── data_loader.py
