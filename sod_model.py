@@ -7,8 +7,10 @@ class EncoderBlock(nn.Module):
         super(EncoderBlock, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True)
         )
         self.pool = nn.MaxPool2d(kernel_size=2, stride=2)
@@ -26,8 +28,10 @@ class DecoderBlock(nn.Module):
         self.upconv = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
         self.conv = nn.Sequential(
             nn.Conv2d(out_channels * 2, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True),
             nn.Conv2d(out_channels, out_channels, kernel_size=3, padding=1),
+            nn.BatchNorm2d(out_channels),
             nn.ReLU(inplace=True)
         )
 
@@ -38,7 +42,7 @@ class DecoderBlock(nn.Module):
         return x
 
 
-# ─── SOD Model (U-Net style) ─────────────────────────────────
+# ─── SOD Model Improved ──────────────────────────────────────
 class SODModel(nn.Module):
     def __init__(self):
         super(SODModel, self).__init__()
@@ -52,8 +56,11 @@ class SODModel(nn.Module):
         # Bottleneck
         self.bottleneck = nn.Sequential(
             nn.Conv2d(256, 512, kernel_size=3, padding=1),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True),
+            nn.Dropout2d(0.3),
             nn.Conv2d(512, 512, kernel_size=3, padding=1),
+            nn.BatchNorm2d(512),
             nn.ReLU(inplace=True)
         )
 

@@ -54,7 +54,7 @@ def train(num_epochs=20, batch_size=16, lr=1e-3):
     optimizer = optim.Adam(model.parameters(), lr=lr)
 
     best_val_loss = float("inf")
-    patience = 5
+    patience = 10
     patience_counter = 0
 
     for epoch in range(1, num_epochs + 1):
@@ -85,4 +85,4 @@ def train(num_epochs=20, batch_size=16, lr=1e-3):
 
 # ─── Main ────────────────────────────────────────────────────
 if __name__ == "__main__":
-    train()
+    train(num_epochs=30, batch_size=16, lr=1e-4)
