@@ -34,10 +34,12 @@ class ECSSDDataset(Dataset):
 
         # Random crop
         if random.random() > 0.5:
-            i, j, h, w = transforms.RandomCrop.get_params(
-                image, output_size=(180, 180))
-            image = transforms.functional.crop(image, i, j, h, w)
-            mask = transforms.functional.crop(mask, i, j, h, w)
+            w, h = image.size
+            if h >= 180 and w >= 180:
+                i, j, ch, cw = transforms.RandomCrop.get_params(
+                    image, output_size=(180, 180))
+                image = transforms.functional.crop(image, i, j, ch, cw)
+                mask = transforms.functional.crop(mask, i, j, ch, cw)
 
         # Brightness variation
         if random.random() > 0.5:
