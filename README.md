@@ -1,4 +1,39 @@
-This project implements an End-to-End system for salient object segmentation using an Encoder-Decoder (CNN) architecture built from scratch in PyTorch. The model features Conv2D and ConvTranspose2D layers, optimized with Batch Normalization, Dropout, and Early Stopping (at Epoch 18). Training was conducted on the ECSSD dataset using a BCE + IoU loss function, achieving a Validation Loss of 0.7561. The structure includes dedicated scripts for training (train.py), evaluation (evaluate.py), and a final notebook with a Gradio demo. To use it, clone the repository and install the dependencies:
+# Salient Object Detection (SOD) using CNN
 
-git clone https://github.com/yllnuredini/sod-project.git
-pip install torch torchvision gradio numpy matplotlib
+This project implements an End-to-End Salient Object Detection system using a Convolutional Neural Network built from scratch in PyTorch.
+The model takes an input image and generates a saliency mask that highlights the most visually important object or region in the image.
+
+Project Contents
+The repository includes:
+
+- Source code for data loading, model training, and evaluation
+- CNN Encoder-Decoder model implementation
+- Trained model checkpoint
+- Evaluation results and visualizations
+- Gradio demo app for testing custom images
+- Project notebook
+
+Project Structure
+
+sod-project/
+│
+├── data_loader.py
+├── sod_model.py
+├── train.py
+├── evaluate.py
+├── app.py
+├── checkpoints/
+├── results/
+├── data/ECSSD/
+├── SOD_Project (1).ipynb
+└── README.md
+
+GitHub Repository
+https://github.com/yllnuredini/sod-project
+
+Run the Demo in Google Colab
+To run the Gradio demo app in Google Colab, use these commands:
+!git clone https://github.com/yllnuredini/sod-project.git
+%cd sod-project
+!pip install torch torchvision opencv-python matplotlib numpy scikit-learn tqdm gradio
+!python app.py
